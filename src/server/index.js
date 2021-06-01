@@ -1,16 +1,13 @@
-const dotenv = require('dotenv');
-dotenv.config();
-
-var path = require('path')
+const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const fetch = require('node-fetch');
 const mockAPIResponse = require('./mockAPI.js')
+const dotenv = require('dotenv');
+dotenv.config();
 
-// Start up an instance of app
 const app = express()
-
-// Cors allows the browser and server to communicate without any security interruptions
+// cors is used so that browser and server can talk to each other without any security interruptions
 const cors = require('cors');
 
 app.use(cors());
@@ -19,37 +16,34 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json());
 app.use(express.static('dist'))
 
-console.log(__dirname)
-
-// API
-const baseURL = 'https://api.meaningcloud.com/sentiment-2.1?'
-const apiKey = process.env.API_KEY
-console.log(`Your API Key is ${apiKey}`);
-let userInput = []
-
-app.get('/', function (req, res) {
-    res.sendFile('dist/index.html')
-    //res.sendFile(path.resolve('src/client/views/index.html'))
-})
-
-app.get('/test', function (req, res) {
-    res.send(mockAPIResponse)
-})
-
-// POST Route
-app.post('/api', async function(req, res) {
-    userInput = req.body.url;
-    console.log(`You entered: ${userInput}`);
-    const apiURL = `${baseURL}key=${apiKey}&url=${userInput}&lang=en`
-
-    const response = await fetch(apiURL)
-    const meaningCloudData = await response.json()
-    console.log(meaningCloudData)
-    res.send(meaningCloudData)
-})
-
-
+//Setting up port for requests
 const port=8081;
 app.listen(port, function () {
-    console.log(`local host running on port ${port}`)
+    console.log(`local host currently running on port: ${port}`)
 })
+
+//http://expressjs.com/en/guide/routing.html 
+
+//GET AND POST ROUTES
+
+//Get method route
+app.get('/', function (req, res) {
+    res.sendFile('dist/index.html')
+})
+
+//POST method route
+//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
+//https://zellwk.com/blog/async-await-express/
+app.post('/', async (request, response) => {
+    const key=process.env.API_KEY;
+    const res = await fetch(`https://api.meaningcloud.com/sentiment-2.1?key=${key}&lang=en&url=${request.body.url}`);  
+    try {
+        const sentimentData = await res.json();
+        response.send(sentimentData);
+    // use catch for catching and handling an error
+    } catch(error) {
+        console.log("error", error);
+    }
+});
+
+

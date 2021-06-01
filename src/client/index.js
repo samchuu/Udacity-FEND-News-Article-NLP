@@ -1,6 +1,6 @@
 // js files
-import { validateURL } from './js/urlChecker'
-import { handleSubmit } from './js/formHandler'
+import { submitHandler } from './js/formHandler'
+
 
 // sass files
 import './styles/resets.scss'
@@ -9,7 +9,4 @@ import './styles/footer.scss'
 import './styles/form.scss'
 import './styles/header.scss'
 
-export {
-    validateURL,
-    handleSubmit
-   }
+export { submitHandler }
